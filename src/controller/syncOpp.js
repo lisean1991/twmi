@@ -35,8 +35,12 @@ const sync = async (data, repeat) => {
     };
     options.method = 'POST';
     options.body = data;
+
     options.body.value = options.body.value.map(item => {
         item.name = item.name.replace(/[&, @,#,$,%,^,*]/g, "");
+        item.createdon = item.createdon || new Date().toISOString();
+        item.estimatedvalue = item.estimatedvalue || 0.00;
+        item.statuscode = item.statuscode || 1;
 
         return item;
     })
@@ -65,7 +69,7 @@ const sync = async (data, repeat) => {
               return;
             }
             // console.log(data)
-            if(data.OpportunityCollection && data.OpportunityCollection.Opportunity){
+            if(data && data.OpportunityCollection && data.OpportunityCollection.Opportunity){
                 resolve(data);     
             }else {
                 console.log(data);
