@@ -1,6 +1,14 @@
 import oRequest  from 'request';
 import {cacheDta} from '../constants.js';
 import {writeMessage} from '../logs/manager.js';
+import {getCookie}  from '../controller/common.js';
+
+const runCycle = 3600 * 100;
+
+
+const writeBack = () => {
+
+}
 
 const handleReAsync = async (oldData, newData, time) => {
     let msg = "";
@@ -103,11 +111,27 @@ const execute = async (url, time, runFlag) => {
         options.url = url;
         oRequest(options, async (error, response, data) => {
     
-          if(error || response.statusCode === 401){
+          if(error){
             console.log(error);
-            writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止，cookie失效！\n*****************************`)
+            writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`)
             // console.log("运行停止，cookie失效！");
             return;
+          }
+
+          if(response.statusCode === 401) {
+            writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行暂停，cookie失效！\n*****************************`)
+            let Cookie = await getCookie();
+            if(Cookie) {
+                cacheDta.TWMI_COOKIE = Cookie
+                writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----重新获取cookie，同步继续！\n*****************************`)
+                execute(url, time, runFlag);
+                return;
+            }
+            writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----重新获取cookie失败，同步终止！\n*****************************`)
+          }
+
+          if(!data) {
+            nextCycle(runFlag)
           }
 
           let nextUrl = data['@odata.nextLink'];
@@ -120,10 +144,11 @@ const execute = async (url, time, runFlag) => {
             console.log("*************request end*****************")
             execute(nextUrl, time, runFlag);
           } else {
-              writeMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
-              setTimeout(() => {
-                execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
-              }, 2 * 3600 * 1000)
+            nextCycle(runFlag)
+            //   writeMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
+            //   setTimeout(() => {
+            //     execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
+            //   }, 2 * 3600 * 1000)
           }
          
         })
@@ -131,11 +156,27 @@ const execute = async (url, time, runFlag) => {
 
         options.url = `${cacheDta.host}opportunities?$select=new_opportunity,name,opportunityid,createdon,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon ge 2020-09-24T00:00:00Z&$orderby=createdon asc`;
         oRequest(options, async (error, response, data) => {
-            if(error || response.statusCode === 401){
+            if(error){
                 console.log(error)
-                writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止，cookie失效！\n*****************************`)
+                writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`)
                 // console.log("运行停止，cookie失效！")
                 return;
+              }
+
+              if(response.statusCode === 401) {
+                writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行暂停，cookie失效！\n*****************************`)
+                let Cookie = await getCookie();
+                if(Cookie) {
+                    cacheDta.TWMI_COOKIE = Cookie
+                    writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----重新获取cookie，同步继续！\n*****************************`)
+                    execute(null, time, runFlag);
+                    return;
+                }
+                writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----重新获取cookie失败，同步终止！\n*****************************`)
+              }
+
+              if(!data) {
+                nextCycle(runFlag)
               }
     
               let nextUrl = data['@odata.nextLink'];
@@ -148,13 +189,21 @@ const execute = async (url, time, runFlag) => {
                 console.log("*************request end*****************")
                 execute(nextUrl, time, runFlag);
               } else {
-                writeMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
-                setTimeout(() => {
-                    execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
-                }, 2 * 3600 * 1000)
+                nextCycle(runFlag)
+                // writeMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
+                // setTimeout(() => {
+                //     execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
+                // }, 2 * 3600 * 1000)
               }
         })
     }
+}
+
+const nextCycle = (runFlag) => {
+    writeMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
+    setTimeout(() => {
+        execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
+    }, runCycle)
 }
 
 const start = async (runFlag) => {

@@ -1,6 +1,7 @@
 import {cacheDta} from '../constants.js';
 import Starter from '../controller/starter.js';
 import {writeMessage} from '../logs/manager.js';
+import {getCookie}  from '../controller/common.js';
 
 import fs from 'fs';
 
@@ -13,7 +14,8 @@ const setResponseHeader = (res)=>{
 }
 
 const autoStart = async () => {
-    let cookie = fs.readFileSync(process.cwd()+'\\src\\cookieFile.txt','utf-8');
+    // let cookie = fs.readFileSync(process.cwd()+'\\src\\cookieFile.txt','utf-8');
+    let cookie = await getCookie();
     cacheDta.TWMI_COOKIE = cookie ? cookie : "";
     let canConnect = await Starter.testConnect();
 
@@ -24,6 +26,7 @@ const autoStart = async () => {
     }else {
         writeMessage('system.log', `\n\nWARNING: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----自动重启运行失败，cookie过期！\n*****************************`)
     }
+    return canConnect;
 }
 
 const route = (app)=>{
@@ -63,6 +66,15 @@ const route = (app)=>{
     }
   })
 
+  app.route("/api/restart").post(async (req,res)=>{
+        let suc = await autoStart();
+        if(suc) {
+            res.status(200).send({code: 0, msg:"同步程序已成功重启！"});
+        }else {
+            res.status(200).send({code: 1, msg:"同步程序启动失败！"});
+        }
+  })
+
   app.route("/log").get(async (req,res)=>{
     let files = fs.readdirSync(process.cwd()+'\\log\\');
 
@@ -96,6 +108,13 @@ const route = (app)=>{
         }
 
     });
+  })
+
+
+  app.route('/test').get((req,res) => {
+      getCookie().then(cookie => {
+        res.status(200).send(cookie)
+      })
   })
 }
 module.exports = route;
