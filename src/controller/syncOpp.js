@@ -6,12 +6,57 @@ import {getCookie}  from '../controller/common.js';
 const runCycle = 3600 * 100;
 
 
-const writeBack = () => {
+const writeBack = async (data, dataBack) => {
+    let options = {};
+    options.json = true;
+    options.url = cacheDta.host + 'opportunities(' + data.opportunityid + ')';
+    options.headers = { 
+        "Content-Type": "application/json", 
+        "Cookie": cacheDta.TWMI_COOKIE,
+    };
+    options.method = 'PATCH';
 
+    options.body = {
+        "new_teco_confidence": dataBack.Confidence_KUTText,
+        "new_teco_crmopportunity_id": dataBack.ID,
+        "new_teco_opportunity_type": dataBack.OpportunityType_KUTText,
+        "new_teco_sales_phase": dataBack.SalesCyclePhaseCodeText
+    }
+
+    return await new Promise(resolve => {
+        oRequest(options, async (error, response, data) => {
+    
+            if(error) {
+                resolve({
+                    data, 
+                    dataBack,
+                    code: 1
+                });
+                return;
+            }
+
+            if(response.statusCode >= 200 && response.statusCode < 300) {
+                resolve({
+                    data, 
+                    dataBack,
+                    code: 0
+                });
+                return;
+            }
+
+            resolve({
+                data, 
+                dataBack,
+                code: 1
+            });
+        })
+    })
 }
 
 const handleReAsync = async (oldData, newData, time) => {
     let msg = "";
+
+    let allReq = [];
     for(let i = 0; i < oldData.value.length; i++) {
         let find = null;
         for(let j = 0; j < newData.length; j++) {
@@ -22,12 +67,24 @@ const handleReAsync = async (oldData, newData, time) => {
         }
 
         if (find) {
-            msg = msg + `CRM: ${find.ID} <====> TWMI: ${find.TACTWMIOpportunityID_KUT}\n`;
+            allReq.push(writeBack(oldData, find));
         } else {
             msg = msg + `WARNING: CRM: null <====> TWMI: ${oldData.value[i].new_opportunity} 同步失败！\n`;
         }
           
     }
+
+    let ares = await Promise.all(allReq);
+
+    for(let k = 0; k < ares.length;  k++) {
+        if(ares[k].code === 0) {
+            msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT}同步成功，回写TWMI成功！\n`;
+        }else {
+            msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT}同步成功，回写TWMI失败！\n`;
+        }
+        
+    }
+
     writeMessage(time + '.log', msg)
 }
 
@@ -128,10 +185,12 @@ const execute = async (url, time, runFlag) => {
                 return;
             }
             writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----重新获取cookie失败，同步终止！\n*****************************`)
+            return;
           }
 
-          if(!data) {
-            nextCycle(runFlag)
+          if(!data && !data.value) {
+            nextCycle(runFlag);
+            return;
           }
 
           let nextUrl = data['@odata.nextLink'];
@@ -161,9 +220,9 @@ const execute = async (url, time, runFlag) => {
                 writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`)
                 // console.log("运行停止，cookie失效！")
                 return;
-              }
+            }
 
-              if(response.statusCode === 401) {
+            if(response.statusCode === 401) {
                 writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行暂停，cookie失效！\n*****************************`)
                 let Cookie = await getCookie();
                 if(Cookie) {
@@ -173,28 +232,30 @@ const execute = async (url, time, runFlag) => {
                     return;
                 }
                 writeMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----重新获取cookie失败，同步终止！\n*****************************`)
-              }
+                return;
+            }
 
-              if(!data) {
-                nextCycle(runFlag)
-              }
-    
-              let nextUrl = data['@odata.nextLink'];
-              let crmRes = await sync(data);
+            if(!data && !data.value) {
+                nextCycle(runFlag);
+                return;
+            }
 
-            //   console.log(crmRes);
-              handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
+            let nextUrl = data['@odata.nextLink'];
+            let crmRes = await sync(data);
 
-              if(nextUrl) {
+        //   console.log(crmRes);
+            handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
+
+            if(nextUrl) {
                 console.log("*************request end*****************")
                 execute(nextUrl, time, runFlag);
-              } else {
+            } else {
                 nextCycle(runFlag)
                 // writeMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
                 // setTimeout(() => {
                 //     execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
                 // }, 2 * 3600 * 1000)
-              }
+            }
         })
     }
 }
