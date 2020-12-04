@@ -3,7 +3,7 @@ import {cacheDta} from '../constants.js';
 import {writeMessage} from '../logs/manager.js';
 import {getCookie}  from '../controller/common.js';
 
-const runCycle = 3600 * 100;
+const runCycle = 3600 * 1000;
 
 
 const writeBack = async (data, dataBack) => {
@@ -16,7 +16,7 @@ const writeBack = async (data, dataBack) => {
     };
     options.method = 'PATCH';
 
-    options.body = {
+    options.body = {       
         "new_teco_confidence": dataBack.Confidence_KUTText,
         "new_teco_crmopportunity_id": dataBack.ID,
         "new_teco_opportunity_type": dataBack.OpportunityType_KUTText,
@@ -197,7 +197,7 @@ const execute = async (url, time, runFlag) => {
           let crmRes = await sync(data);
 
         //   console.log(data);
-          handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
+          await handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
 
           if(nextUrl) {
             console.log("*************request end*****************")
@@ -244,7 +244,7 @@ const execute = async (url, time, runFlag) => {
             let crmRes = await sync(data);
 
         //   console.log(crmRes);
-            handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
+            await handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
 
             if(nextUrl) {
                 console.log("*************request end*****************")
