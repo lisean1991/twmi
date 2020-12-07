@@ -151,7 +151,7 @@ const sync = async (data, repeat) => {
 
 const execute = async (url, time, runFlag) => {
 
-    if(runFlag !== cacheDta.runFlag) {
+    if(runFlag !== cacheDta.runFlagAcc) {
         // console.log("新的同步已运行，终止旧操作！");
         writeAccMessage('system.log', `\n\nWORNING: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----新的同步已运行，终止旧操作！\n*****************************`)
         return;
