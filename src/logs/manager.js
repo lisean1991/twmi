@@ -7,3 +7,11 @@ export const writeMessage = (fileName, message) => {
         console.log(err)
     });
 }
+
+export const writeAccMessage = (fileName, message) => {
+    let pwd = process.cwd();
+    console.log(message);
+    fs.appendFileSync(pwd+'\\acclog\\' + fileName, message+"\n", (err) => {
+        console.log(err)
+    });
+}

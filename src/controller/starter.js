@@ -3,6 +3,8 @@ import {cacheDta} from '../constants.js';
 
 import SyncOpp from './syncOpp.js';
 
+import SyncAcc from './syncAcc.js';
+
 const testConnect = async () => {
     return new Promise((resolve,reject)=>{
         let options = {};
@@ -29,7 +31,13 @@ const start = async (runFlag) => {
     SyncOpp.start(runFlag);
 }
 
+const startAcc = async (runFlag) => {
+    SyncAcc.start(runFlag);
+}
+
+
 export default {
     testConnect,
-    start
+    start,
+    startAcc
 }
