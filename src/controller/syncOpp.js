@@ -23,6 +23,12 @@ const writeBack = async (data, dataBack) => {
         "new_teco_sales_phase": dataBack.SalesCyclePhaseCodeText
     }
 
+    return {
+        data, 
+        dataBack,
+        code: 0
+    };
+
     return await new Promise(resolve => {
         oRequest(options, async (error, response, data) => {
     
@@ -78,7 +84,7 @@ const handleReAsync = async (oldData, newData, time) => {
 
     for(let k = 0; k < ares.length;  k++) {
         if(ares[k].code === 0) {
-            msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT}同步成功，回写TWMI成功！\n`;
+            msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT}同步成功！\n`;
         }else {
             msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT}同步成功，回写TWMI失败！\n`;
         }
