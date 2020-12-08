@@ -195,7 +195,7 @@ const execute = async (url, time, runFlag) => {
             return;
           }
 
-          if(!data && !data.value) {
+          if(!data || !data.value) {
             nextCycle(runFlag);
             return;
           }
@@ -220,7 +220,7 @@ const execute = async (url, time, runFlag) => {
         })
     }else {
 
-        options.url = `${cacheDta.host}opportunities?$select=new_opportunity,accountid,name,opportunityid,createdon,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon ge 2020-09-24T00:00:00Z&$orderby=createdon asc`;
+        options.url = `${cacheDta.host}opportunities?$select=new_opportunity,_customerid_value,name,opportunityid,createdon,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon ge 2020-09-24T00:00:00Z&$orderby=createdon asc`;
         oRequest(options, async (error, response, data) => {
             if(error){
                 console.log(error)
@@ -243,7 +243,7 @@ const execute = async (url, time, runFlag) => {
                 return;
             }
 
-            if(!data && !data.value) {
+            if(!data || !data.value) {
                 nextCycle(runFlag);
                 return;
             }
