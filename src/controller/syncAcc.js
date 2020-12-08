@@ -174,7 +174,8 @@ const execute = async (url, time, runFlag) => {
     
           if(error){
             console.log(error);
-            writeAccMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`)
+            writeAccMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`);
+            nextCycle(runFlag);
             // console.log("运行停止，cookie失效！");
             return;
           }
@@ -217,11 +218,12 @@ const execute = async (url, time, runFlag) => {
         })
     }else {
 
-        options.url = `${cacheDta.host}accounts?$select=new_uniqueid,name,accountid,createdon&$orderby=createdon asc`;
+        options.url = `${cacheDta.host}accounts?$select=new_uniqueid,name,accountid,createdon,address1_city&$orderby=createdon asc`;
         oRequest(options, async (error, response, data) => {
             if(error){
                 console.log(error)
-                writeAccMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`)
+                writeAccMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`);
+                nextCycle(runFlag)
                 // console.log("运行停止，cookie失效！")
                 return;
             }
