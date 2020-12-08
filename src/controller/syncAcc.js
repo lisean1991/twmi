@@ -66,7 +66,7 @@ const handleReAsync = async (oldData, newData, time) => {
     for(let i = 0; i < oldData.value.length; i++) {
         let find = null;
         for(let j = 0; j < newData.length; j++) {
-            if(oldData.value[i].new_uniqueid === newData[j].TACTWMIAccountID_KUT) {
+            if(oldData.value[i].accountid === newData[j].TACTWMIAccountID_KUT) {
                 find = newData[j];
                 break;
             }
