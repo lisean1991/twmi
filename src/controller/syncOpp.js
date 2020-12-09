@@ -108,7 +108,7 @@ const sync = async (data, repeat) => {
     options.body = data;
 
     options.body.value = options.body.value.map(item => {
-        item.name = item.name.replace(/[&, @,#,$,%,^,*]/g, "");
+        item.name = item.name.replace(/[&, @,#,$,%,^,*]/g, " ");
         item.createdon = item.createdon || new Date().toISOString();
         item.estimatedvalue = item.estimatedvalue || 0.00;
         item.statuscode = item.statuscode || 1;
