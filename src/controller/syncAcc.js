@@ -75,7 +75,7 @@ const handleReAsync = async (oldData, newData, time) => {
         if (find) {
             allReq.push(writeBack(oldData, find));
         } else {
-            msg = msg + `WARNING: Account Indo------CRM: null <====> TWMI: ${oldData.value[i].new_CorporateAccount} 同步失败！\n`;
+            msg = msg + `WARNING: Account Indo------CRM: null <====> TWMI: ${oldData.value[i].accountid} 同步失败！\n`;
         }
           
     }
@@ -123,16 +123,16 @@ const sync = async (data, repeat) => {
 
               let newRes = {CorporateAccountCollection: {CorporateAccount: []}};
 
-              //错误重发
-              if(!repeat) {
-                newRes = await new Promise(resolve => {
-                    setTimeout(async () => {
-                       let res =  await sync(oldData, true);
-                       resolve(res);
-                    }, 2000)
+            //   //错误重发
+            //   if(!repeat) {
+            //     newRes = await new Promise(resolve => {
+            //         setTimeout(async () => {
+            //            let res =  await sync(oldData, true);
+            //            resolve(res);
+            //         }, 2000)
             
-                }) 
-              }
+            //     }) 
+            //   }
 
               resolve(newRes);
               return;

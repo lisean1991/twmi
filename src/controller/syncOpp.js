@@ -125,16 +125,16 @@ const sync = async (data, repeat) => {
 
               let newRes = {OpportunityCollection: {Opportunity: []}};
 
-              //错误重发
-              if(!repeat) {
-                newRes = await new Promise(resolve => {
-                    setTimeout(async () => {
-                       let res =  await sync(oldData, true);
-                       resolve(res);
-                    }, 2000)
+            //   //错误重发
+            //   if(!repeat) {
+            //     newRes = await new Promise(resolve => {
+            //         setTimeout(async () => {
+            //            let res =  await sync(oldData, true);
+            //            resolve(res);
+            //         }, 2000)
             
-                }) 
-              }
+            //     }) 
+            //   }
 
               resolve(newRes);
               return;
