@@ -84,7 +84,7 @@ const handleReAsync = async (oldData, newData, time) => {
 
     for(let k = 0; k < ares.length;  k++) {
         if(ares[k].code === 0) {
-            msg = msg + `Account Indo------CRM: ${ares[k].dataBack.AccountID} <====> TWMI: ${ares[k].dataBack.TACTWMIAccountID_KUT}同步成功！\n`;
+            msg = msg + `Account Indo------CRM: ${ares[k].dataBack.AccountID} <====> TWMI: ${ares[k].dataBack.TACTWMIAccountID_KUT}同步成功！时间：${ares[k].dataBack.LastChangeDateTime}\n`;
         }else {
             msg = msg + `Account Indo------CRM: ${ares[k].dataBack.AccountID} <====> TWMI: ${ares[k].dataBack.TACTWMIAccountID_KUT}同步成功，回写TWMI失败！\n`;
         }

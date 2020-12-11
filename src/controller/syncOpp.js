@@ -84,9 +84,9 @@ const handleReAsync = async (oldData, newData, time) => {
 
     for(let k = 0; k < ares.length;  k++) {
         if(ares[k].code === 0) {
-            msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT}同步成功！\n`;
+            msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT} 同步成功！时间：${ares[k].dataBack.LastChangeDateTime}\n`;
         }else {
-            msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT}同步成功，回写TWMI失败！\n`;
+            msg = msg + `CRM: ${ares[k].dataBack.ID} <====> TWMI: ${ares[k].dataBack.TACTWMIOpportunityID_KUT} 同步成功，回写TWMI失败！\n`;
         }
         
     }
@@ -112,6 +112,9 @@ const sync = async (data, repeat) => {
         item.createdon = item.createdon || new Date().toISOString();
         item.estimatedvalue = item.estimatedvalue || 0.00;
         item.statuscode = item.statuscode || 1;
+        item.new_teco_confidence = item.new_teco_confidence || '';
+        item.new_teco_opportunity_type = item.new_teco_opportunity_type || '';
+        item.new_teco_sales_phase = item.new_teco_sales_phase || '001';
 
         return item;
     })
@@ -220,7 +223,7 @@ const execute = async (url, time, runFlag) => {
         })
     }else {
 
-        options.url = `${cacheDta.host}opportunities?$select=new_opportunity,_customerid_value,name,opportunityid,createdon,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon ge 2020-01-01T00:00:00Z&$orderby=createdon asc`;
+        options.url = `${cacheDta.host}opportunities?$select=new_teco_confidence,new_teco_opportunity_type,new_teco_sales_phase,new_opportunity,_customerid_value,name,opportunityid,createdon,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon ge 2019-01-01T00:00:00Z&$orderby=createdon asc`;
         oRequest(options, async (error, response, data) => {
             if(error){
                 console.log(error)
