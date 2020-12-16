@@ -5,6 +5,13 @@ import {getCookie}  from '../controller/common.js';
 
 const runCycle = 3600 * 1000;
 
+const Mapping = {
+    279640000:'101',
+    279640001:'111',
+    279640002:'121',
+    279640003:'131',
+    279640004:'141'
+}
 
 const writeBack = async (data, dataBack) => {
     let options = {};
@@ -114,7 +121,7 @@ const sync = async (data, repeat) => {
         item.statuscode = item.statuscode || 1;
         item.new_teco_confidence = item.new_teco_confidence || '';
         item.new_teco_opportunity_type = item.new_teco_opportunity_type || '';
-        item.new_teco_sales_phase = item.new_teco_sales_phase || '001';
+        item.new_teco_sales_phase = Mapping[item.new_teco_sales_phase] || '001';
 
         return item;
     })
