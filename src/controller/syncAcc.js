@@ -108,7 +108,7 @@ const sync = async (data, repeat) => {
     options.body = data;
 
     options.body.value = options.body.value.map(item => {
-        item.name = item.name.replace(/[&, @,#,$,%,^,*]/g, " ").substr(0,39);
+        item.name = (item.name || '').replace(/[&, @,#,$,%,^,*]/g, " ").substr(0,39);
         item.createdon = item.createdon || new Date().toISOString();
 
         return item;
