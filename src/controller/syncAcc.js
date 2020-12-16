@@ -5,6 +5,8 @@ import {getCookie}  from '../controller/common.js';
 
 const runCycle = 3600 * 2000;
 
+let startDate = '1990-01-01T00:00:00Z';
+let lastStart = '';
 
 const writeBack = async (data, dataBack) => {
     let options = {};
@@ -175,7 +177,7 @@ const execute = async (url, time, runFlag) => {
           if(error){
             console.log(error);
             writeAccMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`);
-            nextCycle(runFlag);
+            nextCycle(time,runFlag);
             // console.log("运行停止，cookie失效！");
             return;
           }
@@ -194,9 +196,11 @@ const execute = async (url, time, runFlag) => {
           }
 
           if(!data && !data.value) {
-            nextCycle(runFlag);
+            nextCycle(time,runFlag);
             return;
           }
+
+          lastStart = data.value.length > 0 ? data.value[data.value.length - 1].createdon : '';
 
           let nextUrl = data['@odata.nextLink'];
           let crmRes = await sync(data);
@@ -208,7 +212,7 @@ const execute = async (url, time, runFlag) => {
             console.log("*************request end*****************")
             execute(nextUrl, time, runFlag);
           } else {
-            nextCycle(runFlag)
+            nextCycle(time,runFlag)
             //   writeAccMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
             //   setTimeout(() => {
             //     execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
@@ -218,12 +222,12 @@ const execute = async (url, time, runFlag) => {
         })
     }else {
 
-        options.url = `${cacheDta.host}accounts?$select=new_uniqueid,name,accountid,createdon,address1_city&$orderby=createdon asc`;
+        options.url = `${cacheDta.host}accounts?$select=new_uniqueid,name,accountid,createdon,address1_city&$filter=createdon gt ${startDate}&$orderby=createdon asc`;
         oRequest(options, async (error, response, data) => {
             if(error){
                 console.log(error)
                 writeAccMessage('system.log', `\n\nERROR: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----运行停止！\n*****************************`);
-                nextCycle(runFlag)
+                nextCycle(time,runFlag)
                 // console.log("运行停止，cookie失效！")
                 return;
             }
@@ -242,9 +246,11 @@ const execute = async (url, time, runFlag) => {
             }
 
             if(!data && !data.value) {
-                nextCycle(runFlag);
+                nextCycle(time,runFlag);
                 return;
             }
+
+            lastStart = data.value.length > 0 ? data.value[data.value.length - 1].createdon : '';
 
             let nextUrl = data['@odata.nextLink'];
             let crmRes = await sync(data);
@@ -256,7 +262,7 @@ const execute = async (url, time, runFlag) => {
                 console.log("*************request end*****************")
                 execute(nextUrl, time, runFlag);
             } else {
-                nextCycle(runFlag)
+                nextCycle(time,runFlag)
                 // writeAccMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
                 // setTimeout(() => {
                 //     execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
@@ -266,7 +272,14 @@ const execute = async (url, time, runFlag) => {
     }
 }
 
-const nextCycle = (runFlag) => {
+const nextCycle = (time,runFlag) => {
+    if(lastStart) {
+        startDate = lastStart;
+        lastStart = '';
+        execute(null, time, runFlag);
+        return;
+    }
+
     writeAccMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
     setTimeout(() => {
         execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
