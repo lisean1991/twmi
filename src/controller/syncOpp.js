@@ -266,12 +266,12 @@ const execute = async (url, time, runFlag) => {
           data.value = value;
 
           let nextUrl = data['@odata.nextLink'];
-          
+
             if(data.value.length > 0) {
                 let crmRes = await sync(data);
 
                 //   console.log(data);
-                await handleReAsync(data, crmRes.CorporateAccountCollection.CorporateAccount, time);
+                await handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
             }
 
           if(nextUrl) {
@@ -342,7 +342,7 @@ const execute = async (url, time, runFlag) => {
                 let crmRes = await sync(data);
 
                 //   console.log(data);
-                await handleReAsync(data, crmRes.CorporateAccountCollection.CorporateAccount, time);
+                await handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
             }
         //     let crmRes = await sync(data);
 
