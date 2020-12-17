@@ -150,9 +150,9 @@ const sync = async (data, repeat) => {
         item.createdon = item.createdon || new Date().toISOString();
         item.estimatedvalue = item.estimatedvalue || 0.00;
         item.statuscode = item.statuscode || 1;
-        item.new_teco_confidence = Mapping2[item.new_teco_confidence] || '101';
-        item.new_teco_opportunity_type = Mapping1[item.new_teco_opportunity_type] || '101';
-        item.new_teco_sales_phase = Mapping[item.new_teco_sales_phase] || '001';
+        item.new_teco_confidence = Mapping2[item.new_teco_confidence] || '';
+        item.new_teco_opportunity_type = Mapping1[item.new_teco_opportunity_type] || '';
+        item.new_teco_sales_phase = Mapping[item.new_teco_sales_phase] || '';
 
         return item;
     })
