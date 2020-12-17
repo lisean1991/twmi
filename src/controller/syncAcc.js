@@ -2,6 +2,7 @@ import oRequest  from 'request';
 import {cacheDta} from '../constants.js';
 import {writeAccMessage} from '../logs/manager.js';
 import {getCookie}  from '../controller/common.js';
+import {ACC_CACHE} from './localCache.js';
 
 const runCycle = 3600 * 2000;
 
@@ -202,11 +203,33 @@ const execute = async (url, time, runFlag) => {
 
           lastStart = data.value.length > 0 ? data.value[data.value.length - 1].createdon : '';
 
-          let nextUrl = data['@odata.nextLink'];
-          let crmRes = await sync(data);
+          let value = [];
 
-        //   console.log(data);
-          await handleReAsync(data, crmRes.CorporateAccountCollection.CorporateAccount, time);
+          for(let i = 0; i < data.value.length; i++) {
+              if(!ACC_CACHE[data.value[i].accountid]) {
+                  value.push(data.value[i]);
+                  ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
+                  continue;
+              }
+
+              if(ACC_CACHE[data.value[i].accountid] < data.value[i].modifiedon) {
+                  ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
+                  value.push(data.value[i]);
+                  continue;
+              }
+          }
+
+          data.value = value;
+
+
+          let nextUrl = data['@odata.nextLink'];
+
+          if(data.value.length > 0) {
+            let crmRes = await sync(data);
+
+            //   console.log(data);
+            await handleReAsync(data, crmRes.CorporateAccountCollection.CorporateAccount, time);
+          }
 
           if(nextUrl) {
             console.log("*************request end*****************")
@@ -252,11 +275,31 @@ const execute = async (url, time, runFlag) => {
 
             lastStart = data.value.length > 0 ? data.value[data.value.length - 1].createdon : '';
 
-            let nextUrl = data['@odata.nextLink'];
-            let crmRes = await sync(data);
+            let value = [];
 
-        //   console.log(crmRes);
-            await handleReAsync(data, crmRes.CorporateAccountCollection.CorporateAccount, time);
+            for(let i = 0; i < data.value.length; i++) {
+                if(!ACC_CACHE[data.value[i].accountid]) {
+                    value.push(data.value[i]);
+                    ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
+                    continue;
+                }
+
+                if(ACC_CACHE[data.value[i].accountid] < data.value[i].modifiedon) {
+                    ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
+                    value.push(data.value[i]);
+                    continue;
+                }
+            }
+
+            data.value = value;
+
+            let nextUrl = data['@odata.nextLink'];
+            if(data.value.length > 0) {
+                let crmRes = await sync(data);
+    
+                //   console.log(data);
+                await handleReAsync(data, crmRes.CorporateAccountCollection.CorporateAccount, time);
+            }
 
             if(nextUrl) {
                 console.log("*************request end*****************")

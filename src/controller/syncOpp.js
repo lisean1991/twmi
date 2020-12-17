@@ -3,6 +3,9 @@ import {cacheDta} from '../constants.js';
 import {writeMessage} from '../logs/manager.js';
 import {getCookie}  from '../controller/common.js';
 
+import {OPP_CACHE} from './localCache.js';
+
+
 const runCycle = 3600 * 1000;
 
 const Mapping = {
@@ -156,6 +159,7 @@ const sync = async (data, repeat) => {
 
         return item;
     })
+    
     // console.log(options)
 
     return await new Promise(resolve => {
@@ -243,11 +247,32 @@ const execute = async (url, time, runFlag) => {
 
           lastStart = data.value.length > 0 ? data.value[data.value.length - 1].createdon : '';
 
-          let nextUrl = data['@odata.nextLink'];
-          let crmRes = await sync(data);
+          let value = [];
 
-        //   console.log(data);
-          await handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
+          for(let i = 0; i < data.value.length; i++) {
+              if(!OPP_CACHE[data.value[i].new_opportunity]) {
+                  value.push(data.value[i]);
+                  OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
+                  continue;
+              }
+
+              if(OPP_CACHE[data.value[i].new_opportunity] < data.value[i].modifiedon) {
+                  OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
+                  value.push(data.value[i]);
+                  continue;
+              }
+          }
+
+          data.value = value;
+
+          let nextUrl = data['@odata.nextLink'];
+          
+            if(data.value.length > 0) {
+                let crmRes = await sync(data);
+
+                //   console.log(data);
+                await handleReAsync(data, crmRes.CorporateAccountCollection.CorporateAccount, time);
+            }
 
           if(nextUrl) {
             console.log("*************request end*****************")
@@ -263,7 +288,7 @@ const execute = async (url, time, runFlag) => {
         })
     }else {
 
-        options.url = `${cacheDta.host}opportunities?$select=new_teco_confidence,new_teco_opportunity_type,new_teco_sales_phase,new_opportunity,_customerid_value,name,opportunityid,createdon,statecode,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon gt ${startDate}&$orderby=createdon asc`;
+        options.url = `${cacheDta.host}opportunities?$select=modifiedon,new_teco_confidence,new_teco_opportunity_type,new_teco_sales_phase,new_opportunity,_customerid_value,name,opportunityid,createdon,statecode,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon gt ${startDate}&$orderby=createdon asc`;
         oRequest(options, async (error, response, data) => {
             if(error){
                 console.log(error)
@@ -293,11 +318,36 @@ const execute = async (url, time, runFlag) => {
 
             lastStart = data.value.length > 0 ? data.value[data.value.length - 1].createdon : '';
 
-            let nextUrl = data['@odata.nextLink'];
-            let crmRes = await sync(data);
+            let value = [];
 
-        //   console.log(crmRes);
-            await handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
+            for(let i = 0; i < data.value.length; i++) {
+                if(!OPP_CACHE[data.value[i].new_opportunity]) {
+                    value.push(data.value[i]);
+                    OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
+                    continue;
+                }
+
+                if(OPP_CACHE[data.value[i].new_opportunity] < data.value[i].modifiedon) {
+                    OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
+                    value.push(data.value[i]);
+                    continue;
+                }
+            }
+
+            data.value = value;
+
+            let nextUrl = data['@odata.nextLink'];
+
+            if(data.value.length > 0) {
+                let crmRes = await sync(data);
+
+                //   console.log(data);
+                await handleReAsync(data, crmRes.CorporateAccountCollection.CorporateAccount, time);
+            }
+        //     let crmRes = await sync(data);
+
+        // //   console.log(crmRes);
+        //     await handleReAsync(data, crmRes.OpportunityCollection.Opportunity, time);
 
             if(nextUrl) {
                 console.log("*************request end*****************")
