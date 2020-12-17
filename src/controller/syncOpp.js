@@ -6,11 +6,39 @@ import {getCookie}  from '../controller/common.js';
 const runCycle = 3600 * 1000;
 
 const Mapping = {
+    279640000:	'001',
+    279640001:	'002',
+    279640002:	'003',
+    279640003:	'Z09',
+    279640004:	'004',
+    279640005:	'005',
+    279640006:	'006',
+    279640008:	'Z01',
+    279640007:	'Z02',
+    279640010:	'Z03',
+    279640009:	'Z07',
+    279640011:	'Z08'
+}
+
+const Mapping1 = {
     279640000:'101',
     279640001:'111',
     279640002:'121',
     279640003:'131',
     279640004:'141'
+}
+
+
+const Mapping2 = {
+    279640000:'101',
+    279640001:'111',
+    279640002:'121',
+    279640003:'131',
+    279640004:'141',
+    279640005:'151',
+    279640006:'171',
+    279640007:'181',
+
 }
 
 let startDate = '2019-01-01T00:00:00Z';
@@ -122,8 +150,8 @@ const sync = async (data, repeat) => {
         item.createdon = item.createdon || new Date().toISOString();
         item.estimatedvalue = item.estimatedvalue || 0.00;
         item.statuscode = item.statuscode || 1;
-        item.new_teco_confidence = item.new_teco_confidence || '';
-        item.new_teco_opportunity_type = item.new_teco_opportunity_type || '';
+        item.new_teco_confidence = Mapping2[item.new_teco_confidence] || '101';
+        item.new_teco_opportunity_type = Mapping1[item.new_teco_opportunity_type] || '101';
         item.new_teco_sales_phase = Mapping[item.new_teco_sales_phase] || '001';
 
         return item;
