@@ -149,7 +149,7 @@ const sync = async (data, repeat) => {
         item.name = item.name.replace(/[&, @,#,$,%,^,*]/g, " ").substr(0,99);
         item.createdon = item.createdon || new Date().toISOString();
         item.estimatedvalue = item.estimatedvalue || 0.00;
-        item.statuscode = item.statuscode || 1;
+        item.statuscode = item.statecode || 0;
         item.new_teco_confidence = Mapping2[item.new_teco_confidence] || '';
         item.new_teco_opportunity_type = Mapping1[item.new_teco_opportunity_type] || '';
         item.new_teco_sales_phase = Mapping[item.new_teco_sales_phase] || '';
@@ -263,7 +263,7 @@ const execute = async (url, time, runFlag) => {
         })
     }else {
 
-        options.url = `${cacheDta.host}opportunities?$select=new_teco_confidence,new_teco_opportunity_type,new_teco_sales_phase,new_opportunity,_customerid_value,name,opportunityid,createdon,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon gt ${startDate}&$orderby=createdon asc`;
+        options.url = `${cacheDta.host}opportunities?$select=new_teco_confidence,new_teco_opportunity_type,new_teco_sales_phase,new_opportunity,_customerid_value,name,opportunityid,createdon,statecode,statuscode,estimatedclosedate,estimatedvalue&$expand=parentaccountid($select=new_uniqueid,name,accountid,statuscode),owninguser($select=fullname)&$filter=createdon gt ${startDate}&$orderby=createdon asc`;
         oRequest(options, async (error, response, data) => {
             if(error){
                 console.log(error)
