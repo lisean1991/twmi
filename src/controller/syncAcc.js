@@ -71,6 +71,7 @@ const handleReAsync = async (oldData, newData, time) => {
         for(let j = 0; j < newData.length; j++) {
             if(oldData.value[i].accountid === newData[j].TACTWMIAccountID_KUT) {
                 find = newData[j];
+                ACC_CACHE[oldData.value[i].accountid] = oldData.value[i].modifiedon;
                 break;
             }
         }
@@ -208,12 +209,12 @@ const execute = async (url, time, runFlag) => {
           for(let i = 0; i < data.value.length; i++) {
               if(!ACC_CACHE[data.value[i].accountid]) {
                   value.push(data.value[i]);
-                  ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
+                //   ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
                   continue;
               }
 
               if(ACC_CACHE[data.value[i].accountid] < data.value[i].modifiedon) {
-                  ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
+                //   ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
                   value.push(data.value[i]);
                   continue;
               }
@@ -280,12 +281,12 @@ const execute = async (url, time, runFlag) => {
             for(let i = 0; i < data.value.length; i++) {
                 if(!ACC_CACHE[data.value[i].accountid]) {
                     value.push(data.value[i]);
-                    ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
+                    // ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
                     continue;
                 }
 
                 if(ACC_CACHE[data.value[i].accountid] < data.value[i].modifiedon) {
-                    ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
+                    // ACC_CACHE[data.value[i].accountid] = data.value[i].modifiedon;
                     value.push(data.value[i]);
                     continue;
                 }

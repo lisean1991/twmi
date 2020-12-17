@@ -109,6 +109,7 @@ const handleReAsync = async (oldData, newData, time) => {
         for(let j = 0; j < newData.length; j++) {
             if(oldData.value[i].new_opportunity === newData[j].TACTWMIOpportunityID_KUT) {
                 find = newData[j];
+                OPP_CACHE[oldData.value[i].new_opportunity] = oldData.value[i].modifiedon;
                 break;
             }
         }
@@ -252,12 +253,12 @@ const execute = async (url, time, runFlag) => {
           for(let i = 0; i < data.value.length; i++) {
               if(!OPP_CACHE[data.value[i].new_opportunity]) {
                   value.push(data.value[i]);
-                  OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
+                //   OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
                   continue;
               }
 
               if(OPP_CACHE[data.value[i].new_opportunity] < data.value[i].modifiedon) {
-                  OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
+                //   OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
                   value.push(data.value[i]);
                   continue;
               }
@@ -323,12 +324,12 @@ const execute = async (url, time, runFlag) => {
             for(let i = 0; i < data.value.length; i++) {
                 if(!OPP_CACHE[data.value[i].new_opportunity]) {
                     value.push(data.value[i]);
-                    OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
+                    // OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
                     continue;
                 }
 
                 if(OPP_CACHE[data.value[i].new_opportunity] < data.value[i].modifiedon) {
-                    OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
+                    // OPP_CACHE[data.value[i].new_opportunity] = data.value[i].modifiedon;
                     value.push(data.value[i]);
                     continue;
                 }
