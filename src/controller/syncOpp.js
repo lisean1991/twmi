@@ -44,6 +44,21 @@ const Mapping2 = {
 
 }
 
+const Mapping3 = {
+    0: {
+        salesPhase: '001',
+        confidence: "101"
+    },
+    1: {
+        salesPhase: 'Z01',
+        confidence: "141"
+    },
+    2: {
+        salesPhase: 'Z03',
+        confidence: "181"
+    }
+}
+
 let startDate = '2019-01-01T00:00:00Z';
 let lastStart = '';
 
@@ -154,9 +169,9 @@ const sync = async (data, repeat) => {
         item.createdon = item.createdon || new Date().toISOString();
         item.estimatedvalue = item.estimatedvalue || 0.00;
         item.statuscode = item.statecode || 0;
-        item.new_teco_confidence = Mapping2[item.new_teco_confidence] || '';
+        item.new_teco_confidence = Mapping2[item.new_teco_confidence] || Mapping3[item.statuscode].confidence;
         item.new_teco_opportunity_type = Mapping1[item.new_teco_opportunity_type] || '';
-        item.new_teco_sales_phase = Mapping[item.new_teco_sales_phase] || '';
+        item.new_teco_sales_phase = Mapping[item.new_teco_sales_phase] || Mapping3[item.statuscode].salesPhase;
 
         return item;
     })
