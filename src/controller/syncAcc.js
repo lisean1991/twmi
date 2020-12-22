@@ -326,6 +326,7 @@ const nextCycle = (time,runFlag) => {
 
     writeAccMessage('system.log', `\n\nINFO: ${new Date(Date.now() + 8000 * 3600).toISOString()}-----等待下一轮执行！\n*****************************`)
     setTimeout(() => {
+        startDate = '1990-01-01T00:00:00Z';
         execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
     }, runCycle)
 }

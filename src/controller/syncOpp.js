@@ -389,6 +389,7 @@ const nextCycle = (time, runFlag) => {
     }
 
     setTimeout(() => {
+        startDate = '2019-01-01T00:00:00Z';
         execute(null, new Date(Date.now() + 8 * 3600 * 1000).toISOString().substr(0, 16).replace(":", ""), runFlag);
     }, runCycle)
 }
