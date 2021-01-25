@@ -105,7 +105,10 @@ const sync = async (data, repeat) => {
     options.url = cacheDta.cpiAcchost;
     options.headers = { 
         "Content-Type": "application/json", 
-        'Authorization': 'Basic UzAwMTg1ODI1NTk6SXR0czEyMzRANQ=='
+        'Authorization': 'Basic UzAwMTg1ODI1NTk6SXR0czEyMzRANg=='
+
+        //UzAwMTg1ODI1NTk6SXR0czEyMzRANQ==
+        //UzAwMTg1ODI1NTk6SXR0czEyMzRANg==
         // "Connection":"keep-alive"
     };
     options.method = 'POST';
