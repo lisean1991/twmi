@@ -105,7 +105,7 @@ const sync = async (data, repeat) => {
     options.url = cacheDta.cpiAcchost;
     options.headers = { 
         "Content-Type": "application/json", 
-        'Authorization': 'Basic UzAwMTg1ODI1NTk6SXR0czEyMzRAMDc='
+        'Authorization': cacheDta.authData
 
         //UzAwMTg1ODI1NTk6SXR0czEyMzRANw==
         //UzAwMTg1ODI1NTk6SXR0czEyMzRANg==
