@@ -38,7 +38,7 @@ export const getCookie = async () => {
         options.method = 'POST';
         options.form = {
           'UserName': 'kwattnick@tecowestinghouse.ca',
-          'Password': 'Tecopass.2016',
+          'Password': 'Tecopass/.2022',
           'AuthMethod': 'FormsAuthentication'
         }
   
