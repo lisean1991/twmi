@@ -59,7 +59,7 @@ const Mapping3 = {
     }
 }
 
-let startDate = '2019-01-01T00:00:00Z';
+let startDate = '2021-01-01T00:00:00Z';
 let lastStart = '';
 
 const writeBack = async (data, dataBack) => {
